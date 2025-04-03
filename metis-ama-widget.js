@@ -546,15 +546,16 @@ const MetisAMAWidget = (function() {
         pt: "Portuguese"
     };
     
-    // Available UI languages
+    // Available UI languages with flag emojis
     const uiLanguages = [
-        { code: 'en', name: 'English' },
-        { code: 'es', name: 'Español' },
-        { code: 'tr', name: 'Türkçe' },
-        { code: 'ru', name: 'Русский' },
-        { code: 'zh', name: '中文' },
-        { code: 'ko', name: '한국어' },
-        { code: 'pt', name: 'Português' }
+        { code: 'en', name: 'English', flag: '🇬🇧' },
+        { code: 'es', name: 'Español', flag: '🇪🇸' },
+        { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+        { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+        { code: 'zh', name: '中文', flag: '🇨🇳' },
+        { code: 'ko', name: '한국어', flag: '🇰🇷' },
+        { code: 'pt', name: 'Português', flag: '🇵🇹' },
+        { code: 'de', name: 'Deutsch', flag: '🇩🇪' }
     ];
     
     // UI translations
@@ -672,7 +673,8 @@ const MetisAMAWidget = (function() {
         
         const languageButton = document.createElement('button');
         languageButton.className = 'language-button';
-        languageButton.textContent = uiLanguages.find(lang => lang.code === state.uiLanguage).name;
+        const currentLang = uiLanguages.find(lang => lang.code === state.uiLanguage);
+        languageButton.innerHTML = `${currentLang.flag} ${currentLang.name}`;
         
         const languageDropdown = document.createElement('div');
         languageDropdown.className = 'language-dropdown';
@@ -681,7 +683,7 @@ const MetisAMAWidget = (function() {
             const langOption = document.createElement('div');
             langOption.className = 'language-option';
             langOption.setAttribute('data-lang', lang.code);
-            langOption.textContent = lang.name;
+            langOption.innerHTML = `${lang.flag} ${lang.name}`;
             
             // Add active class to current language
             if (lang.code === state.uiLanguage) {
@@ -692,8 +694,9 @@ const MetisAMAWidget = (function() {
                 // Update language
                 state.uiLanguage = lang.code;
                 
-                // Update button text
-                languageButton.textContent = lang.name;
+                // Update button text with flag
+                const selectedLang = uiLanguages.find(l => l.code === lang.code);
+                languageButton.innerHTML = `${selectedLang.flag} ${selectedLang.name}`;
                 
                 // Update active class
                 languageDropdown.querySelectorAll('.language-option').forEach(option => {
