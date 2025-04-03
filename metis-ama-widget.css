@@ -229,6 +229,19 @@ body {
     color: var(--metis-text);
     margin-top: 5px;
     padding-right: 60px; /* Make room for language tag */
+    position: relative;
+}
+
+.question-text.translated {
+    padding-right: 80px; /* Extra room for translation badge */
+}
+
+.translated-badge {
+    position: absolute;
+    right: 12px;
+    top: 0;
+    font-size: 14px;
+    cursor: help;
 }
 
 .translation {
@@ -239,6 +252,24 @@ body {
     color: var(--metis-dark-text);
     font-style: italic;
     line-height: 1.4;
+}
+
+.original-text {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--metis-dark-text);
+}
+
+.original-label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    color: var(--metis-light-blue);
+    font-weight: 500;
 }
 
 /* Only show category in All Categories view */
