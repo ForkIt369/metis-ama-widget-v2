@@ -1187,6 +1187,126 @@ const MetisAMAWidget = (function() {
         });
     }
     
+    // Translate a question to the current UI language
+    function translateQuestion(question) {
+        // If question is already in the user's selected language, return it as-is
+        if (question.language === state.uiLanguage) {
+            return {
+                text: question.text,
+                isNative: true
+            };
+        }
+        
+        // If we're in English mode and the question has a translation (from another language)
+        if (state.uiLanguage === 'en' && question.translation) {
+            return {
+                text: question.translation,
+                isNative: false,
+                originalText: question.text,
+                originalLanguage: question.language
+            };
+        }
+        
+        // For other language combinations, we'll simulate a translation
+        // Note: In a production environment, this would use a real translation service or pre-translated content
+        
+        // If the question is in English, translate to the target language
+        if (question.language === 'en') {
+            // Simulated translations (these would be actual translations in production)
+            const simulatedTranslations = {
+                es: {
+                    prefix: "Traducido: ",
+                    originalLabel: "Original (inglés)"
+                },
+                tr: {
+                    prefix: "Çevrilmiş: ",
+                    originalLabel: "Orijinal (İngilizce)"
+                },
+                ru: {
+                    prefix: "Переведено: ",
+                    originalLabel: "Оригинал (английский)"
+                },
+                zh: {
+                    prefix: "已翻译: ",
+                    originalLabel: "原文 (英文)"
+                },
+                ko: {
+                    prefix: "번역됨: ",
+                    originalLabel: "원본 (영어)"
+                },
+                pt: {
+                    prefix: "Traduzido: ",
+                    originalLabel: "Original (inglês)"
+                },
+                de: {
+                    prefix: "Übersetzt: ",
+                    originalLabel: "Original (Englisch)"
+                }
+            };
+            
+            return {
+                text: simulatedTranslations[state.uiLanguage]?.prefix + question.text,
+                isNative: false,
+                originalText: question.text,
+                originalLanguage: question.language,
+                originalLabel: simulatedTranslations[state.uiLanguage]?.originalLabel || "Original (English)"
+            };
+        }
+        
+        // If question is in another language and has a translation, translate from English to target
+        if (question.translation) {
+            // First get the English translation
+            const englishText = question.translation;
+            
+            // Then simulate translating from English to target language
+            const simulatedTranslations = {
+                es: {
+                    prefix: "Traducido: ",
+                    originalLabel: `Original (${languages[question.language]})`
+                },
+                tr: {
+                    prefix: "Çevrilmiş: ",
+                    originalLabel: `Orijinal (${languages[question.language]})`
+                },
+                ru: {
+                    prefix: "Переведено: ",
+                    originalLabel: `Оригинал (${languages[question.language]})`
+                },
+                zh: {
+                    prefix: "已翻译: ",
+                    originalLabel: `原文 (${languages[question.language]})`
+                },
+                ko: {
+                    prefix: "번역됨: ",
+                    originalLabel: `원본 (${languages[question.language]})`
+                },
+                pt: {
+                    prefix: "Traduzido: ",
+                    originalLabel: `Original (${languages[question.language]})`
+                },
+                de: {
+                    prefix: "Übersetzt: ",
+                    originalLabel: `Original (${languages[question.language]})`
+                }
+            };
+            
+            return {
+                text: simulatedTranslations[state.uiLanguage]?.prefix + englishText,
+                isNative: false,
+                originalText: question.text,
+                originalLanguage: question.language,
+                originalLabel: simulatedTranslations[state.uiLanguage]?.originalLabel || `Original (${languages[question.language]})`
+            };
+        }
+        
+        // Fallback - just return the original with a note
+        return {
+            text: `[${languages[question.language]}] ` + question.text,
+            isNative: false,
+            noTranslation: true
+        };
+    }
+    
     // Render questions to container
     function renderQuestions(container, questions) {
         container.innerHTML = '';
@@ -1217,12 +1337,12 @@ const MetisAMAWidget = (function() {
         }
         
         // Create question cards
-    questions.forEach((question, index) => {
-        const card = document.createElement('div');
-        card.className = 'question-card slide-in';
-        card.setAttribute('tabindex', '0');
-        card.setAttribute('role', 'article');
-        card.setAttribute('aria-labelledby', `question-${index}`);
+        questions.forEach((question, index) => {
+            const card = document.createElement('div');
+            card.className = 'question-card slide-in';
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'article');
+            card.setAttribute('aria-labelledby', `question-${index}`);
             
             // Category tag - only visible in All Categories view thanks to CSS
             const categoryTag = document.createElement('span');
@@ -1235,24 +1355,44 @@ const MetisAMAWidget = (function() {
             languageTag.textContent = languages[question.language] || question.language;
             languageTag.setAttribute('title', `Question in ${languages[question.language] || question.language}`);
             
+            // Translate the question to current UI language
+            const translatedQuestion = translateQuestion(question);
+            
             // Question text
             const questionText = document.createElement('div');
             questionText.className = 'question-text';
             questionText.id = `question-${index}`;
-            questionText.textContent = question.text;
+            questionText.textContent = translatedQuestion.text;
+            
+            // Add a translated badge if not in the native language
+            if (!translatedQuestion.isNative) {
+                questionText.classList.add('translated');
+                
+                const translatedBadge = document.createElement('span');
+                translatedBadge.className = 'translated-badge';
+                translatedBadge.textContent = '🌐';
+                translatedBadge.setAttribute('title', 'Machine translated');
+                
+                questionText.appendChild(translatedBadge);
+            }
             
             card.appendChild(categoryTag);
             card.appendChild(languageTag);
             card.appendChild(questionText);
             
-            // Add translation if available and not English
-            if (question.translation && question.language !== 'en') {
-                const translation = document.createElement('div');
-                translation.className = 'translation';
-                translation.textContent = question.translation;
-                translation.setAttribute('lang', 'en');
-                translation.setAttribute('aria-label', 'English translation');
-                card.appendChild(translation);
+            // Add original text if it's a translation
+            if (!translatedQuestion.isNative && !translatedQuestion.noTranslation) {
+                const originalText = document.createElement('div');
+                originalText.className = 'original-text';
+                
+                const originalLabel = document.createElement('span');
+                originalLabel.className = 'original-label';
+                originalLabel.textContent = translatedQuestion.originalLabel || `Original (${languages[question.language]})`;
+                
+                originalText.appendChild(originalLabel);
+                originalText.appendChild(document.createTextNode(translatedQuestion.originalText));
+                
+                card.appendChild(originalText);
             }
             
             container.appendChild(card);
