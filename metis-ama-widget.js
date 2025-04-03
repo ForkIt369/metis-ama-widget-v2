@@ -704,8 +704,16 @@ const MetisAMAWidget = (function() {
                 });
                 langOption.classList.add('active');
                 
-                // Update UI text
+                // Update UI text and re-render questions
                 updateUILanguage();
+                
+                // Re-render questions in the new language
+                if (state.viewMode === ViewMode.QUESTIONS) {
+                    const questionsContainer = document.querySelector('.questions-container');
+                    if (questionsContainer) {
+                        renderQuestions(questionsContainer, getFilteredQuestions());
+                    }
+                }
             });
             
             languageDropdown.appendChild(langOption);
@@ -1352,11 +1360,11 @@ const MetisAMAWidget = (function() {
             categoryTag.className = 'category-tag';
             categoryTag.textContent = question.categoryName;
             
-            // Language tag
+            // Language tag - showing current UI language instead of the original
             const languageTag = document.createElement('span');
             languageTag.className = 'question-language';
-            languageTag.textContent = languages[question.language] || question.language;
-            languageTag.setAttribute('title', `Question in ${languages[question.language] || question.language}`);
+            languageTag.textContent = languages[state.uiLanguage] || state.uiLanguage;
+            languageTag.setAttribute('title', `Displayed in ${languages[state.uiLanguage] || state.uiLanguage}`);
             
             // Translate the question to current UI language
             const translatedQuestion = translateQuestion(question);
