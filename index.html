@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metis AMA Question Analysis Widget</title>
+    <link rel="stylesheet" href="metis-ama-widget.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Metis AMA Question Analysis Widget</h1>
+        <p>Embeddable widget for Metis (Hyperion/Andromeda) AMA questions</p>
+        
+        <!-- This is where the widget will be embedded -->
+        <div id="metis-ama-widget"></div>
+    </div>
+    
+    <!-- Widget script -->
+    <script src="metis-ama-widget.js"></script>
+    <script>
+        // Initialize the widget
+        MetisAMAWidget.init({
+            container: 'metis-ama-widget'
+        });
+    </script>
+</body>
+</html>
